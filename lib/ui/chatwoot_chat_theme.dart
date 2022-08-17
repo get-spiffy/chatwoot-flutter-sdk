@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_ui/flutter_chat_ui.dart' as ui;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 
-const CHATWOOT_COLOR_PRIMARY = Color(0xff1f93ff);
+const CHATWOOT_COLOR_PRIMARY = Color(0xFF3A76BA);
 const CHATWOOT_BG_COLOR = Color(0xfff4f6fb);
 const CHATWOOT_AVATAR_COLORS = [CHATWOOT_COLOR_PRIMARY];
 
@@ -12,7 +13,7 @@ class ChatwootChatTheme extends ChatTheme {
   /// override only a couple of variables.
   const ChatwootChatTheme({
     Widget? attachmentButtonIcon,
-    Color backgroundColor = CHATWOOT_BG_COLOR,
+    Color backgroundColor = Colors.white,
     TextStyle dateDividerTextStyle = const TextStyle(
       color: Colors.black26,
       fontSize: 12,
@@ -22,14 +23,14 @@ class ChatwootChatTheme extends ChatTheme {
     Widget? deliveredIcon,
     Widget? documentIcon,
     TextStyle emptyChatPlaceholderTextStyle = const TextStyle(
-      color: NEUTRAL_2,
+      color: ui.neutral2,
       fontSize: 16,
       fontWeight: FontWeight.w500,
       height: 1.5,
     ),
-    Color errorColor = ERROR,
+    Color errorColor = ui.error,
     Widget? errorIcon,
-    Color inputBackgroundColor = Colors.white,
+    Color inputBackgroundColor = CHATWOOT_BG_COLOR,
     BorderRadius inputBorderRadius = const BorderRadius.all(
       Radius.circular(10),
     ),
@@ -48,25 +49,25 @@ class ChatwootChatTheme extends ChatTheme {
       height: 1.5,
     ),
     TextStyle receivedMessageCaptionTextStyle = const TextStyle(
-      color: NEUTRAL_2,
+      color: ui.neutral2,
       fontSize: 12,
       fontWeight: FontWeight.w500,
       height: 1.333,
     ),
-    Color receivedMessageDocumentIconColor = PRIMARY,
+    Color receivedMessageDocumentIconColor = ui.primary,
     TextStyle receivedMessageLinkDescriptionTextStyle = const TextStyle(
-      color: NEUTRAL_0,
+      color: ui.neutral0,
       fontSize: 14,
       fontWeight: FontWeight.w400,
       height: 1.428,
     ),
     TextStyle receivedMessageLinkTitleTextStyle = const TextStyle(
-      color: NEUTRAL_0,
+      color: ui.neutral0,
       fontSize: 16,
       fontWeight: FontWeight.w800,
       height: 1.375,
     ),
-    Color secondaryColor = Colors.white,
+    Color secondaryColor = ui.secondary,
     Widget? seenIcon,
     Widget? sendButtonIcon,
     Widget? sendingIcon,
@@ -77,27 +78,27 @@ class ChatwootChatTheme extends ChatTheme {
       height: 1.5,
     ),
     TextStyle sentMessageCaptionTextStyle = const TextStyle(
-      color: NEUTRAL_7_WITH_OPACITY,
+      color: ui.neutral7WithOpacity,
       fontSize: 12,
       fontWeight: FontWeight.w500,
       height: 1.333,
     ),
-    Color sentMessageDocumentIconColor = NEUTRAL_7,
+    Color sentMessageDocumentIconColor = ui.neutral7,
     TextStyle sentMessageLinkDescriptionTextStyle = const TextStyle(
-      color: NEUTRAL_7,
+      color: ui.neutral7,
       fontSize: 14,
       fontWeight: FontWeight.w400,
       height: 1.428,
     ),
     TextStyle sentMessageLinkTitleTextStyle = const TextStyle(
-      color: NEUTRAL_7,
+      color: ui.neutral7,
       fontSize: 16,
       fontWeight: FontWeight.w800,
       height: 1.375,
     ),
     List<Color> userAvatarNameColors = CHATWOOT_AVATAR_COLORS,
     TextStyle userAvatarTextStyle = const TextStyle(
-      color: NEUTRAL_7,
+      color: ui.neutral7,
       fontSize: 12,
       fontWeight: FontWeight.w800,
       height: 1.333,
@@ -108,10 +109,47 @@ class ChatwootChatTheme extends ChatTheme {
       fontWeight: FontWeight.w800,
       height: 1.333,
     ),
+    EdgeInsets attachmentButtonMargin = const EdgeInsets.all(10),
+    EdgeInsets dateDividerMargin = const EdgeInsets.all(10),
+    EdgeInsets inputMargin = const EdgeInsets.all(10),
+    EdgeInsets inputPadding = const EdgeInsets.all(10),
+    EdgeInsets sendButtonMargin = const EdgeInsets.all(10),
+    EdgeInsets statusIconPadding = const EdgeInsets.all(10),
+    InputDecoration inputTextDecoration = const InputDecoration(
+      border: InputBorder.none,
+      contentPadding: const EdgeInsets.all(10),
+    ),
+    double messageInsetsHorizontal = 10.0,
+    double messageInsetsVertical = 10.0,
+    Color userAvatarImageBackgroundColor = Colors.white,
+    TextStyle receivedEmojiMessageTextStyle = const TextStyle(
+      color: Colors.black87,
+      fontSize: 16,
+      fontWeight: FontWeight.w500,
+      height: 1.5,
+    ),
+    TextStyle sentEmojiMessageTextStyle = const TextStyle(
+      color: Colors.black87,
+      fontSize: 16,
+      fontWeight: FontWeight.w500,
+      height: 1.5,
+    ),
   }) : super(
           attachmentButtonIcon: attachmentButtonIcon,
+          attachmentButtonMargin: attachmentButtonMargin,
+          dateDividerMargin: dateDividerMargin,
+          inputMargin: inputMargin,
+          inputPadding: inputPadding,
+          inputTextDecoration: inputTextDecoration,
+          messageInsetsHorizontal: messageInsetsHorizontal,
+          messageInsetsVertical: messageInsetsVertical,
+          sendButtonMargin: sendButtonMargin,
+          statusIconPadding: statusIconPadding,
           backgroundColor: backgroundColor,
+          receivedEmojiMessageTextStyle: receivedEmojiMessageTextStyle,
+          sentEmojiMessageTextStyle: sentEmojiMessageTextStyle,
           dateDividerTextStyle: dateDividerTextStyle,
+          userAvatarImageBackgroundColor: userAvatarImageBackgroundColor,
           deliveredIcon: deliveredIcon,
           documentIcon: documentIcon,
           emptyChatPlaceholderTextStyle: emptyChatPlaceholderTextStyle,
@@ -126,8 +164,7 @@ class ChatwootChatTheme extends ChatTheme {
           receivedMessageBodyTextStyle: receivedMessageBodyTextStyle,
           receivedMessageCaptionTextStyle: receivedMessageCaptionTextStyle,
           receivedMessageDocumentIconColor: receivedMessageDocumentIconColor,
-          receivedMessageLinkDescriptionTextStyle:
-              receivedMessageLinkDescriptionTextStyle,
+          receivedMessageLinkDescriptionTextStyle: receivedMessageLinkDescriptionTextStyle,
           receivedMessageLinkTitleTextStyle: receivedMessageLinkTitleTextStyle,
           secondaryColor: secondaryColor,
           seenIcon: seenIcon,
@@ -136,8 +173,7 @@ class ChatwootChatTheme extends ChatTheme {
           sentMessageBodyTextStyle: sentMessageBodyTextStyle,
           sentMessageCaptionTextStyle: sentMessageCaptionTextStyle,
           sentMessageDocumentIconColor: sentMessageDocumentIconColor,
-          sentMessageLinkDescriptionTextStyle:
-              sentMessageLinkDescriptionTextStyle,
+          sentMessageLinkDescriptionTextStyle: sentMessageLinkDescriptionTextStyle,
           sentMessageLinkTitleTextStyle: sentMessageLinkTitleTextStyle,
           userAvatarNameColors: userAvatarNameColors,
           userAvatarTextStyle: userAvatarTextStyle,

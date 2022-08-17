@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -38,9 +38,9 @@ class _MyHomePageState extends State<MyHomePage> {
   _showChatwootDialog() {
     ChatwootChatDialog.show(
       context,
-      baseUrl: "https://app.chatwoot.com",
-      inboxIdentifier: "xxxxxxxxxxxxxxxxxxx",
-      title: "Chatwoot Support",
+      baseUrl: "https://cw.getspiffy.com.com",
+      inboxIdentifier: "FBgtBqoGGTib1Fzj1JXn3YqR",
+      title: "Spiffy Support",
       user: ChatwootUser(
         identifier: "test@test.com",
         name: "Tester test",
@@ -52,8 +52,8 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return ChatwootChat(
-      baseUrl: "https://app.chatwoot.com",
-      inboxIdentifier: "xxxxxxxxxxxxxxxxxxx",
+      baseUrl: "https://cw.getspiffy.com",
+      inboxIdentifier: "FBgtBqoGGTib1Fzj1JXn3YqR",
       user: ChatwootUser(
         identifier: "test1@test.com",
         name: "Tester test1",

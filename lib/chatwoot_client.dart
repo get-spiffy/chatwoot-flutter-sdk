@@ -1,11 +1,11 @@
 import 'package:chatwoot_client_sdk/chatwoot_client_sdk.dart';
+import 'package:chatwoot_client_sdk/chatwoot_parameters.dart';
 import 'package:chatwoot_client_sdk/data/chatwoot_repository.dart';
 import 'package:chatwoot_client_sdk/data/local/entity/chatwoot_contact.dart';
 import 'package:chatwoot_client_sdk/data/local/entity/chatwoot_conversation.dart';
 import 'package:chatwoot_client_sdk/data/remote/requests/chatwoot_action_data.dart';
 import 'package:chatwoot_client_sdk/data/remote/requests/chatwoot_new_message_request.dart';
 import 'package:chatwoot_client_sdk/di/modules.dart';
-import 'package:chatwoot_client_sdk/chatwoot_parameters.dart';
 import 'package:chatwoot_client_sdk/repository_parameters.dart';
 import 'package:riverpod/riverpod.dart';
 
@@ -27,12 +27,10 @@ class ChatwootClient {
   String get inboxIdentifier => _parameters.inboxIdentifier;
 
   ChatwootClient._(this._parameters, {this.user, this.callbacks}) {
-    providerContainerMap.putIfAbsent(
-        _parameters.clientInstanceKey, () => ProviderContainer());
+    providerContainerMap.putIfAbsent(_parameters.clientInstanceKey, () => ProviderContainer());
     final container = providerContainerMap[_parameters.clientInstanceKey]!;
     _repository = container.read(chatwootRepositoryProvider(
-        RepositoryParameters(
-            params: _parameters, callbacks: callbacks ?? ChatwootCallbacks())));
+        RepositoryParameters(params: _parameters, callbacks: callbacks ?? ChatwootCallbacks())));
   }
 
   void _init() {
@@ -54,8 +52,7 @@ class ChatwootClient {
   /// Sends chatwoot message. The echoId is your temporary message id. When message sends successfully
   /// [ChatwootMessage] will be returned with the [echoId] on [ChatwootCallbacks.onMessageSent]. If
   /// message fails to send [ChatwootCallbacks.onError] will be triggered [echoId] as data.
-  Future<void> sendMessage(
-      {required String content, required String echoId}) async {
+  Future<void> sendMessage({required String content, required String echoId}) async {
     final request = ChatwootNewMessageRequest(content: content, echoId: echoId);
     await _repository.sendMessage(request);
   }
@@ -97,16 +94,13 @@ class ChatwootClient {
 
     final chatwootParams = ChatwootParameters(
         clientInstanceKey: getClientInstanceKey(
-            baseUrl: baseUrl,
-            inboxIdentifier: inboxIdentifier,
-            userIdentifier: user?.identifier),
+            baseUrl: baseUrl, inboxIdentifier: inboxIdentifier, userIdentifier: user?.identifier),
         isPersistenceEnabled: enablePersistence,
         baseUrl: baseUrl,
         inboxIdentifier: inboxIdentifier,
         userIdentifier: user?.identifier);
 
-    final client =
-        ChatwootClient._(chatwootParams, callbacks: callbacks, user: user);
+    final client = ChatwootClient._(chatwootParams, callbacks: callbacks, user: user);
 
     client._init();
 
@@ -122,9 +116,7 @@ class ChatwootClient {
   /// Create separate [ChatwootClient] instances with same baseUrl, inboxIdentifier, userIdentifier and persistence
   /// enabled will be regarded as same therefore use same contact and conversation.
   static String getClientInstanceKey(
-      {required String baseUrl,
-      required String inboxIdentifier,
-      String? userIdentifier}) {
+      {required String baseUrl, required String inboxIdentifier, String? userIdentifier}) {
     return "$baseUrl$_keySeparator$userIdentifier$_keySeparator$inboxIdentifier";
   }
 
@@ -133,21 +125,13 @@ class ChatwootClient {
   ///Clears all persisted chatwoot data on device for a particular chatwoot client instance.
   ///See [getClientInstanceKey] on how chatwoot client instance are differentiated
   static Future<void> clearData(
-      {required String baseUrl,
-      required String inboxIdentifier,
-      String? userIdentifier}) async {
+      {required String baseUrl, required String inboxIdentifier, String? userIdentifier}) async {
     final clientInstanceKey = getClientInstanceKey(
-        baseUrl: baseUrl,
-        inboxIdentifier: inboxIdentifier,
-        userIdentifier: userIdentifier);
-    providerContainerMap.putIfAbsent(
-        clientInstanceKey, () => ProviderContainer());
+        baseUrl: baseUrl, inboxIdentifier: inboxIdentifier, userIdentifier: userIdentifier);
+    providerContainerMap.putIfAbsent(clientInstanceKey, () => ProviderContainer());
     final container = providerContainerMap[clientInstanceKey]!;
     final params = ChatwootParameters(
-        isPersistenceEnabled: true,
-        baseUrl: "",
-        inboxIdentifier: "",
-        clientInstanceKey: "");
+        isPersistenceEnabled: true, baseUrl: "", inboxIdentifier: "", clientInstanceKey: "");
 
     final localStorage = container.read(localStorageProvider(params));
     await localStorage.clear();
@@ -162,10 +146,7 @@ class ChatwootClient {
     providerContainerMap.putIfAbsent("all", () => ProviderContainer());
     final container = providerContainerMap["all"]!;
     final params = ChatwootParameters(
-        isPersistenceEnabled: true,
-        baseUrl: "",
-        inboxIdentifier: "",
-        clientInstanceKey: "");
+        isPersistenceEnabled: true, baseUrl: "", inboxIdentifier: "", clientInstanceKey: "");
 
     final localStorage = container.read(localStorageProvider(params));
     await localStorage.clearAll();

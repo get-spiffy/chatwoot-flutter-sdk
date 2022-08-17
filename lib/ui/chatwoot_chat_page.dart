@@ -45,7 +45,7 @@ class ChatwootChat extends StatefulWidget {
   final void Function(types.Message)? onMessageLongPress;
 
   /// See [Message.onMessageTap]
-  final void Function(types.Message)? onMessageTap;
+  final void Function(BuildContext context, types.Message)? onMessageTap;
 
   /// See [Input.onSendPressed]
   final void Function(types.PartialText)? onSendPressed;
@@ -157,7 +157,7 @@ class ChatwootChat extends StatefulWidget {
 
 class _ChatwootChatState extends State<ChatwootChat> {
   ///
-  List<types.Message> _messages = [];
+  List<types.Message> _messages = List.empty(growable: true);
 
   late String status;
 
@@ -200,9 +200,8 @@ class _ChatwootChatState extends State<ChatwootChat> {
       onPersistedMessagesRetrieved: (persistedMessages) {
         if (widget.enablePersistence) {
           setState(() {
-            _messages = persistedMessages
-                .map((message) => _chatwootMessageToTextMessage(message))
-                .toList();
+            _messages =
+                persistedMessages.map((message) => _chatwootMessageToTextMessage(message)).toList();
           });
         }
         widget.onPersistedMessagesRetrieved?.call(persistedMessages);
@@ -212,11 +211,9 @@ class _ChatwootChatState extends State<ChatwootChat> {
           return;
         }
         setState(() {
-          final chatMessages = messages
-              .map((message) => _chatwootMessageToTextMessage(message))
-              .toList();
-          final mergedMessages =
-              <types.Message>[..._messages, ...chatMessages].toSet().toList();
+          final chatMessages =
+              messages.map((message) => _chatwootMessageToTextMessage(message)).toList();
+          final mergedMessages = <types.Message>[..._messages, ...chatMessages].toSet().toList();
           final now = DateTime.now().millisecondsSinceEpoch;
           mergedMessages.sort((a, b) {
             return (b.createdAt ?? now).compareTo(a.createdAt ?? now);
@@ -230,13 +227,12 @@ class _ChatwootChatState extends State<ChatwootChat> {
         widget.onMessageReceived?.call(chatwootMessage);
       },
       onMessageDelivered: (chatwootMessage, echoId) {
-        _handleMessageSent(
-            _chatwootMessageToTextMessage(chatwootMessage, echoId: echoId));
+        _handleMessageSent(_chatwootMessageToTextMessage(chatwootMessage, echoId: echoId));
         widget.onMessageDelivered?.call(chatwootMessage);
       },
       onMessageUpdated: (chatwootMessage) {
-        _handleMessageUpdated(_chatwootMessageToTextMessage(chatwootMessage,
-            echoId: chatwootMessage.id.toString()));
+        _handleMessageUpdated(
+            _chatwootMessageToTextMessage(chatwootMessage, echoId: chatwootMessage.id.toString()));
         widget.onMessageUpdated?.call(chatwootMessage);
       },
       onMessageSent: (chatwootMessage, echoId) {
@@ -287,8 +283,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
     });
   }
 
-  types.TextMessage _chatwootMessageToTextMessage(ChatwootMessage message,
-      {String? echoId}) {
+  types.TextMessage _chatwootMessageToTextMessage(ChatwootMessage message, {String? echoId}) {
     String? avatarUrl = message.sender?.avatarUrl ?? message.sender?.thumbnail;
 
     //Sets avatar url to null if its a gravatar not found url
@@ -331,11 +326,11 @@ class _ChatwootChatState extends State<ChatwootChat> {
     });
   }
 
-  void _handleMessageTap(types.Message message) async {
+  void _handleMessageTap(BuildContext context, types.Message message) async {
     if (message.status == types.Status.error && message is types.TextMessage) {
       _handleResendMessage(message);
     }
-    widget.onMessageTap?.call(message);
+    widget.onMessageTap?.call(context, message);
   }
 
   void _handlePreviewDataFetched(
@@ -343,9 +338,9 @@ class _ChatwootChatState extends State<ChatwootChat> {
     types.PreviewData previewData,
   ) {
     final index = _messages.indexWhere((element) => element.id == message.id);
-    final updatedMessage = _messages[index].copyWith(previewData: previewData);
+    final updatedMessage = _messages[index];
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _messages[index] = updatedMessage;
       });
@@ -361,7 +356,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
       return;
     }
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _messages[index] = message;
       });
@@ -373,7 +368,11 @@ class _ChatwootChatState extends State<ChatwootChat> {
   ) {
     final index = _messages.indexWhere((element) => element.id == message.id);
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    if (index == -1) {
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _messages[index] = message;
       });
@@ -390,8 +389,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
 
     _addMessage(textMessage);
 
-    chatwootClient!
-        .sendMessage(content: textMessage.text, echoId: textMessage.id);
+    chatwootClient!.sendMessage(content: textMessage.text, echoId: textMessage.id);
     widget.onSendPressed?.call(message);
   }
 
@@ -399,55 +397,66 @@ class _ChatwootChatState extends State<ChatwootChat> {
   Widget build(BuildContext context) {
     final horizontalPadding = widget.isPresentedInDialog ? 8.0 : 16.0;
     return Scaffold(
-      appBar: widget.appBar,
-      backgroundColor: widget.theme.backgroundColor,
-      body: Column(
-        children: [
-          Flexible(
-            child: Padding(
-              padding: EdgeInsets.only(
-                  left: horizontalPadding, right: horizontalPadding),
-              child: Chat(
-                messages: _messages,
-                onMessageTap: _handleMessageTap,
-                onPreviewDataFetched: _handlePreviewDataFetched,
-                onSendPressed: _handleSendPressed,
-                user: _user,
-                onEndReached: widget.onEndReached,
-                onEndReachedThreshold: widget.onEndReachedThreshold,
-                onMessageLongPress: widget.onMessageLongPress,
-                onTextChanged: widget.onTextChanged,
-                showUserAvatars: widget.showUserAvatars,
-                showUserNames: widget.showUserNames,
-                timeFormat: widget.timeFormat ?? DateFormat.Hm(),
-                dateFormat: widget.timeFormat ?? DateFormat("EEEE MMMM d"),
-                theme: widget.theme,
-                l10n: widget.l10n,
+      backgroundColor: Color(0xff3a76ba),
+      appBar: AppBar(
+        title: Text("Spiffy Customer Service"),
+        automaticallyImplyLeading: false,
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20.0),
+            topRight: Radius.circular(20.0),
+          ),
+        ),
+        child: Column(
+          children: [
+            Flexible(
+              child: Padding(
+                padding: EdgeInsets.only(left: horizontalPadding, right: horizontalPadding),
+                child: Chat(
+                  messages: _messages,
+                  onMessageTap: _handleMessageTap,
+                  onPreviewDataFetched: _handlePreviewDataFetched,
+                  onSendPressed: _handleSendPressed,
+                  user: _user,
+                  onEndReached: widget.onEndReached,
+                  onEndReachedThreshold: widget.onEndReachedThreshold,
+                  // onMessageLongPress: widget.onMessageLongPress,
+                  inputOptions: InputOptions(onTextChanged: widget.onTextChanged),
+                  showUserAvatars: widget.showUserAvatars,
+                  showUserNames: widget.showUserNames,
+                  timeFormat: widget.timeFormat ?? DateFormat.Hm(),
+                  dateFormat: widget.timeFormat ?? DateFormat("EEEE MMMM d"),
+                  theme: widget.theme,
+                  l10n: widget.l10n,
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  "assets/logo_grey.png",
-                  package: 'chatwoot_client_sdk',
-                  width: 15,
-                  height: 15,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Text(
-                    "Powered by Chatwoot",
-                    style: TextStyle(color: Colors.black45, fontSize: 12),
-                  ),
-                )
-              ],
-            ),
-          )
-        ],
+            // Padding(
+            //   padding: const EdgeInsets.all(8.0),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: [
+            //       Image.asset(
+            //         "assets/logo_grey.png",
+            //         package: 'chatwoot_client_sdk',
+            //         width: 15,
+            //         height: 15,
+            //       ),
+            //       Padding(
+            //         padding: const EdgeInsets.only(left: 8.0),
+            //         child: Text(
+            //           "Powered by Chatwoot",
+            //           style: TextStyle(color: Colors.black45, fontSize: 12),
+            //         ),
+            //       )
+            //     ],
+            //   ),
+            // )
+          ],
+        ),
       ),
     );
   }
