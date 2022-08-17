@@ -5,7 +5,6 @@ import 'package:chatwoot_client_sdk/data/local/entity/chatwoot_contact.dart';
 import 'package:chatwoot_client_sdk/data/local/entity/chatwoot_conversation.dart';
 import 'package:chatwoot_client_sdk/data/local/entity/chatwoot_message.dart';
 import 'package:chatwoot_client_sdk/data/local/entity/chatwoot_user.dart';
-import 'package:chatwoot_client_sdk/di/modules.dart';
 import 'package:chatwoot_client_sdk/ui/chatwoot_chat_dialog.dart';
 import 'package:chatwoot_client_sdk/ui/chatwoot_l10n.dart';
 import 'package:flutter/material.dart';
@@ -41,39 +40,33 @@ void main() {
   final String testModalTitle = "ChatwootSupport";
 
   setUpAll(() async {
-    mockContact = ChatwootContact.fromJson(
-        await TestResourceUtil.readJsonResource(fileName: "contact"));
+    mockContact =
+        ChatwootContact.fromJson(await TestResourceUtil.readJsonResource(fileName: "contact"));
 
     mockConversation = ChatwootConversation.fromJson(
         await TestResourceUtil.readJsonResource(fileName: "conversation"));
 
     mockMessages = [
-      ChatwootMessage.fromJson(
-          await TestResourceUtil.readJsonResource(fileName: "message"))
+      ChatwootMessage.fromJson(await TestResourceUtil.readJsonResource(fileName: "message"))
     ];
 
-    when(mockService.getContact())
-        .thenAnswer((realInvocation) => Future.value(mockContact));
+    when(mockService.getContact()).thenAnswer((realInvocation) => Future.value(mockContact));
     when(mockService.getConversations())
         .thenAnswer((realInvocation) => Future.value([mockConversation]));
-    when(mockService.getAllMessages())
-        .thenAnswer((realInvocation) => Future.value(mockMessages));
-    when(mockService.sendAction(any, any))
-        .thenAnswer((realInvocation) => Future.microtask(() {}));
+    when(mockService.getAllMessages()).thenAnswer((realInvocation) => Future.value(mockMessages));
+    when(mockService.sendAction(any, any)).thenAnswer((realInvocation) => Future.microtask(() {}));
 
     when(mockService.connection).thenReturn(mockWebSocketChannel);
 
     mockProviderContainer = ProviderContainer();
-    mockProviderContainer.updateOverrides([
-      chatwootClientServiceProvider
-          .overrideWithProvider((ref, param) => mockService)
-    ]);
-    ChatwootClient.providerContainerMap.update(
-        testClientInstanceKey, (_) => mockProviderContainer,
+    // mockProviderContainer.updateOverrides([
+    //   chatwootClientServiceProvider
+    //       .overrideWithProvider((ref, param) => mockService)
+    // ]);
+    ChatwootClient.providerContainerMap.update(testClientInstanceKey, (_) => mockProviderContainer,
         ifAbsent: () => mockProviderContainer);
-    ChatwootClient.providerContainerMap.update(
-        "all", (_) => mockProviderContainer,
-        ifAbsent: () => mockProviderContainer);
+    ChatwootClient.providerContainerMap
+        .update("all", (_) => mockProviderContainer, ifAbsent: () => mockProviderContainer);
   });
 
   testWidgets(
