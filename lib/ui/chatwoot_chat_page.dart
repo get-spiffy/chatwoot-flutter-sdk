@@ -200,8 +200,11 @@ class _ChatwootChatState extends State<ChatwootChat> {
       onPersistedMessagesRetrieved: (persistedMessages) {
         if (widget.enablePersistence) {
           setState(() {
-            _messages =
-                persistedMessages.map((message) => _chatwootMessageToTextMessage(message)).toList();
+            _messages = persistedMessages
+                .map((message) => message.messageType == types.TextMessage
+                    ? _chatwootMessageToTextMessage(message)
+                    : _chatwootMessageToImageMessage(message))
+                .toList();
           });
         }
         widget.onPersistedMessagesRetrieved?.call(persistedMessages);
@@ -211,8 +214,11 @@ class _ChatwootChatState extends State<ChatwootChat> {
           return;
         }
         setState(() {
-          final chatMessages =
-              messages.map((message) => _chatwootMessageToTextMessage(message)).toList();
+          final chatMessages = messages
+              .map((message) => message.messageType == types.TextMessage
+                  ? _chatwootMessageToTextMessage(message)
+                  : _chatwootMessageToImageMessage(message))
+              .toList();
           final mergedMessages = <types.Message>[..._messages, ...chatMessages].toSet().toList();
           final now = DateTime.now().millisecondsSinceEpoch;
           mergedMessages.sort((a, b) {
@@ -223,16 +229,29 @@ class _ChatwootChatState extends State<ChatwootChat> {
         widget.onMessagesRetrieved?.call(messages);
       },
       onMessageReceived: (chatwootMessage) {
-        _addMessage(_chatwootMessageToTextMessage(chatwootMessage));
+        if (chatwootMessage.messageType == types.TextMessage) {
+          _addMessage(_chatwootMessageToTextMessage(chatwootMessage));
+        } else {
+          _addMessage(_chatwootMessageToImageMessage(chatwootMessage));
+        }
+
         widget.onMessageReceived?.call(chatwootMessage);
       },
       onMessageDelivered: (chatwootMessage, echoId) {
-        _handleMessageSent(_chatwootMessageToTextMessage(chatwootMessage, echoId: echoId));
+        if (chatwootMessage.messageType == types.TextMessage) {
+          _addMessage(_chatwootMessageToTextMessage(chatwootMessage));
+        } else {
+          _addMessage(_chatwootMessageToImageMessage(chatwootMessage));
+        }
         widget.onMessageDelivered?.call(chatwootMessage);
       },
       onMessageUpdated: (chatwootMessage) {
-        _handleMessageUpdated(
-            _chatwootMessageToTextMessage(chatwootMessage, echoId: chatwootMessage.id.toString()));
+        if (chatwootMessage.messageType == types.TextMessage) {
+          _addMessage(_chatwootMessageToTextMessage(chatwootMessage));
+        } else {
+          _addMessage(_chatwootMessageToImageMessage(chatwootMessage));
+        }
+
         widget.onMessageUpdated?.call(chatwootMessage);
       },
       onMessageSent: (chatwootMessage, echoId) {
@@ -281,6 +300,31 @@ class _ChatwootChatState extends State<ChatwootChat> {
           error.toString(), ChatwootClientExceptionType.CREATE_CLIENT_FAILED));
       print("chatwoot client failed with error $error: $stackTrace");
     });
+  }
+
+  types.ImageMessage _chatwootMessageToImageMessage(ChatwootMessage message, {String? echoId}) {
+    String? avatarUrl = message.sender?.avatarUrl ?? message.sender?.thumbnail;
+
+    //Sets avatar url to null if its a gravatar not found url
+    //This enables placeholder for avatar to show
+    if (avatarUrl?.contains("?d=404") ?? false) {
+      avatarUrl = null;
+    }
+
+    return types.ImageMessage(
+      id: echoId ?? message.id.toString(),
+      author: message.isMine
+          ? _user
+          : types.User(
+              id: message.sender?.id.toString() ?? idGen.v4(),
+              firstName: message.sender?.name,
+              imageUrl: avatarUrl,
+            ),
+      uri: message.dataUrl,
+      name: message.dataUrl.split("/").last,
+      size: message.fileSize,
+      status: message.isMine ? types.Status.sent : types.Status.delivered,
+    );
   }
 
   types.TextMessage _chatwootMessageToTextMessage(ChatwootMessage message, {String? echoId}) {

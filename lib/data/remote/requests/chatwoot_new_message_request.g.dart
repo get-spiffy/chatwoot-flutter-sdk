@@ -7,12 +7,11 @@ part of 'chatwoot_new_message_request.dart';
 // **************************************************************************
 
 ChatwootNewMessageRequest _$ChatwootNewMessageRequestFromJson(
-    Map<String, dynamic> json) {
-  return ChatwootNewMessageRequest(
-    content: json['content'] as String,
-    echoId: json['echo_id'] as String,
-  );
-}
+        Map<String, dynamic> json) =>
+    ChatwootNewMessageRequest(
+      content: json['content'] as String,
+      echoId: json['echo_id'] as String,
+    );
 
 Map<String, dynamic> _$ChatwootNewMessageRequestToJson(
         ChatwootNewMessageRequest instance) =>

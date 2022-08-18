@@ -50,9 +50,7 @@ class ChatwootUserAdapter extends TypeAdapter<ChatwootUser> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ChatwootUserAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+      other is ChatwootUserAdapter && runtimeType == other.runtimeType && typeId == other.typeId;
 }
 
 // **************************************************************************
@@ -70,8 +68,7 @@ ChatwootUser _$ChatwootUserFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$ChatwootUserToJson(ChatwootUser instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$ChatwootUserToJson(ChatwootUser instance) => <String, dynamic>{
       'identifier': instance.identifier,
       'identifierHash': instance.identifierHash,
       'name': instance.name,

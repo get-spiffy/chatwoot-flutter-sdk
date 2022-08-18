@@ -64,8 +64,7 @@ ChatwootConversation _$ChatwootConversationFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$ChatwootConversationToJson(
-        ChatwootConversation instance) =>
+Map<String, dynamic> _$ChatwootConversationToJson(ChatwootConversation instance) =>
     <String, dynamic>{
       'id': instance.id,
       'inbox_id': instance.inboxId,

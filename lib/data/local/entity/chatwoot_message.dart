@@ -57,22 +57,32 @@ class ChatwootMessage extends Equatable {
   @HiveField(8)
   final ChatwootEventMessageUser? sender;
 
+  @JsonKey(name: "data_url", fromJson: urlFromJson)
+  @HiveField(9)
+  final String dataUrl;
+
+  @JsonKey(name: "file_size", fromJson: fileSizeFromJson)
+  @HiveField(10)
+  final num fileSize;
+
   ///checks if message belongs to contact making the request
   bool get isMine => messageType != 1;
 
-  ChatwootMessage(
-      {required this.id,
-      required this.content,
-      required this.messageType,
-      required this.contentType,
-      required this.contentAttributes,
-      required this.createdAt,
-      required this.conversationId,
-      required this.attachments,
-      required this.sender});
+  ChatwootMessage({
+    required this.id,
+    required this.content,
+    required this.messageType,
+    required this.contentType,
+    required this.contentAttributes,
+    required this.createdAt,
+    required this.conversationId,
+    required this.attachments,
+    required this.sender,
+    required this.dataUrl,
+    required this.fileSize,
+  });
 
-  factory ChatwootMessage.fromJson(Map<String, dynamic> json) =>
-      _$ChatwootMessageFromJson(json);
+  factory ChatwootMessage.fromJson(Map<String, dynamic> json) => _$ChatwootMessageFromJson(json);
 
   Map<String, dynamic> toJson() => _$ChatwootMessageToJson(this);
 
@@ -86,13 +96,26 @@ class ChatwootMessage extends Equatable {
         createdAt,
         conversationId,
         attachments,
-        sender
+        sender,
+        dataUrl,
+        fileSize,
       ];
 }
 
 int idFromJson(value) {
   if (value is String) {
     return int.tryParse(value) ?? 0;
+  }
+  return value;
+}
+
+String urlFromJson(value) {
+  return value != null ? value : "";
+}
+
+num fileSizeFromJson(value) {
+  if (value is String) {
+    return num.tryParse(value) ?? 0;
   }
   return value;
 }

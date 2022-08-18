@@ -47,9 +47,7 @@ class ChatwootContactAdapter extends TypeAdapter<ChatwootContact> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ChatwootContactAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+      other is ChatwootContactAdapter && runtimeType == other.runtimeType && typeId == other.typeId;
 }
 
 // **************************************************************************
@@ -66,8 +64,7 @@ ChatwootContact _$ChatwootContactFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$ChatwootContactToJson(ChatwootContact instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$ChatwootContactToJson(ChatwootContact instance) => <String, dynamic>{
       'id': instance.id,
       'source_id': instance.contactIdentifier,
       'pubsub_token': instance.pubsubToken,
